@@ -1,5 +1,4 @@
-// Grid.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import PathfindingLogic from "./Pathfindinglogic";
 import Car from "./Car";
 import "./Grid.css";
@@ -7,8 +6,9 @@ import "./Grid.css";
 function Grid() {
   const [grid, setGrid] = useState(() => Array(2500).fill(0));
   const [maze, setMaze] = useState([]);
-  const [path, setPath] = useState([]);
   const [carPosition, setCarPosition] = useState(null);
+  const [visitedPath, setVisitedPath] = useState([]);
+  const [finalPath, setFinalPath] = useState([]);
 
   let [count, setCount] = useState(0);
   let [origin, setOrigin] = useState(null);
@@ -57,33 +57,19 @@ function Grid() {
         setCarPosition(index);
       } else {
         setDestination(index);
-        highlightPath(index);
+        setVisitedPath([]);
+        setFinalPath([]);
       }
       return newCount;
     });
   };
-
-  const highlightPath = (end) => {
-    const path = PathfindingLogic(origin, end, maze);
-    if (path.length > 0) {
-      setPath(path);
-    } else {
-      alert("No path found");
-    }
-  };
-
-  useEffect(() => {
-    if (path.length > 0 && destination !== null) {
-      Car.moveCar(path, setCarPosition);
-    }
-  }, [path, destination]);
 
   const renderGrid = () => {
     return grid.map((item, i) => (
       <div
         onClick={() => routeHandle(i)}
         key={i}
-        className={`grid-cell ${i === origin ? "origin" : i === destination ? "destination" : path.includes(i) ? "path" : maze.includes(i) ? "maze" : "wall"}`}
+        className={`grid-cell ${i === origin ? "origin" : i === destination ? "destination" : finalPath.includes(i) ? "final-path" : visitedPath.includes(i) ? "visited" : maze.includes(i) ? "maze" : "wall"}`}
       >
         {carPosition === i && <Car />}
       </div>
@@ -101,13 +87,24 @@ function Grid() {
           setMaze(randomArray);
           setOrigin(null);
           setDestination(null);
-          setPath([]);
+          setVisitedPath([]);
+          setFinalPath([]);
           setCarPosition(null);
           setCount(0);
         }}
       >
         Create Random Maze
       </button>
+      {origin !== null && destination !== null && (
+        <PathfindingLogic
+          start={origin}
+          end={destination}
+          maze={maze}
+          setCarPosition={setCarPosition}
+          setVisitedPath={setVisitedPath}
+          setFinalPath={setFinalPath}
+        />
+      )}
     </>
   );
 }
