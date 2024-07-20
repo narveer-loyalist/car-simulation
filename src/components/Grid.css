@@ -1,0 +1,34 @@
+/* Grid.css */
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(50, minmax(0, 1fr));
+    width: 750px;
+  }
+  
+  .grid-cell {
+    height: 15px;
+    width: 15px;
+    border: 1px solid grey;
+    position: relative;
+  }
+  
+  .grid-cell.origin {
+    background-color: green;
+  }
+  
+  .grid-cell.destination {
+    background-color: red;
+  }
+  
+  .grid-cell.path {
+    background-color: yellow;
+  }
+  
+  .grid-cell.maze {
+    background-color: white;
+  }
+  
+  .grid-cell.wall {
+    background-color: black;
+  }
+  
