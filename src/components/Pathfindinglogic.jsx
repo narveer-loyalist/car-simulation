@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 
-const PathfindingLogic = ({ start, end, maze, setCarPosition, setVisitedPath, setFinalPath }) => {
+const PathfindingLogic = ({ start, end, gridSize, maze, setCarPosition, setVisitedPath, setFinalPath }) => {
   useEffect(() => {
     const visited = new Set();
     let path = [];
@@ -15,13 +15,13 @@ const PathfindingLogic = ({ start, end, maze, setCarPosition, setVisitedPath, se
       setVisitedPath((prev) => [...prev, current]);
       setCarPosition(current);
 
-      const neighbors = getNeighbors(current);
+      const neighbors = getNeighbors(current, gridSize);
 
       for (const neighbor of neighbors) {
         if (!visited.has(neighbor) && maze.includes(neighbor)) {
           path.push(neighbor);
           setCarPosition(neighbor);
-          await new Promise((resolve) => setTimeout(resolve, 200)); // Adjust the delay as needed
+          await new Promise((resolve) => setTimeout(resolve, 200));
 
           if (await animateDFS(neighbor)) {
             return true;
@@ -29,7 +29,7 @@ const PathfindingLogic = ({ start, end, maze, setCarPosition, setVisitedPath, se
 
           path.pop();
           setCarPosition(path[path.length - 1] || start);
-          await new Promise((resolve) => setTimeout(resolve, 200)); // Adjust the delay as needed
+          await new Promise((resolve) => setTimeout(resolve, 200));
         }
       }
 
@@ -37,20 +37,20 @@ const PathfindingLogic = ({ start, end, maze, setCarPosition, setVisitedPath, se
     };
 
     animateDFS(start);
-  }, [start, end, maze, setCarPosition, setVisitedPath, setFinalPath]);
+  }, [start, end, gridSize, maze, setCarPosition, setVisitedPath, setFinalPath]);
 
   return null;
 };
 
-const getNeighbors = (index) => {
+const getNeighbors = (index, gridSize) => {
   const neighbors = [];
-  const row = Math.floor(index / 50);
-  const col = index % 50;
+  const row = Math.floor(index / gridSize);
+  const col = index % gridSize;
 
   if (col > 0) neighbors.push(index - 1);
-  if (col < 49) neighbors.push(index + 1);
-  if (row > 0) neighbors.push(index - 50);
-  if (row < 49) neighbors.push(index + 50);
+  if (col < gridSize - 1) neighbors.push(index + 1);
+  if (row > 0) neighbors.push(index - gridSize);
+  if (row < gridSize - 1) neighbors.push(index + gridSize);
 
   return neighbors;
 };

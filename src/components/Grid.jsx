@@ -1,10 +1,10 @@
-import React, { useState } from "react";
-import PathfindingLogic from "./Pathfindinglogic";
+import React, { useState, useEffect } from "react";
+import PathfindingLogic from "./PathfindingLogic";
 import Car from "./Car";
 import "./Grid.css";
 
-function Grid() {
-  const [grid, setGrid] = useState(() => Array(2500).fill(0));
+function Grid({ gridSize }) {
+  const [grid, setGrid] = useState([]);
   const [maze, setMaze] = useState([]);
   const [carPosition, setCarPosition] = useState(null);
   const [visitedPath, setVisitedPath] = useState([]);
@@ -14,6 +14,10 @@ function Grid() {
   let [origin, setOrigin] = useState(null);
   let [destination, setDestination] = useState(null);
 
+  useEffect(() => {
+    setGrid(Array(gridSize * gridSize).fill(0));
+  }, [gridSize]);
+
   const generateRandomArrayWithPath = (size, max) => {
     const array = Array.from({ length: size }, () =>
       Math.floor(Math.random() * (max + 1))
@@ -21,29 +25,29 @@ function Grid() {
 
     const startX = 0;
     const startY = 0;
-    const endX = 49;
-    const endY = 49;
+    const endX = gridSize - 1;
+    const endY = gridSize - 1;
 
     let currentX = startX;
     let currentY = startY;
 
-    array[currentY * 50 + currentX] = max + 1;
+    array[currentY * gridSize + currentX] = max + 1;
 
-    const randomX = Math.floor(Math.random() * 50);
+    const randomX = Math.floor(Math.random() * gridSize);
 
     while (currentX < randomX) {
       currentX++;
-      array[currentY * 50 + currentX] = max + 1;
+      array[currentY * gridSize + currentX] = max + 1;
     }
 
     while (currentY < endY) {
       currentY++;
-      array[currentY * 50 + currentX] = max + 1;
+      array[currentY * gridSize + currentX] = max + 1;
     }
 
     while (currentX < endX) {
       currentX++;
-      array[currentY * 50 + currentX] = max + 1;
+      array[currentY * gridSize + currentX] = max + 1;
     }
 
     return array;
@@ -78,12 +82,14 @@ function Grid() {
 
   return (
     <>
-      <div className="grid-container">
-        {renderGrid()}
+      <div className="grid-wrapper">
+        <div className="grid-container" style={{ gridTemplateColumns: `repeat(${gridSize}, 1fr)`, gridTemplateRows: `repeat(${gridSize}, 1fr)` }}>
+          {renderGrid()}
+        </div>
       </div>
       <button
         onClick={() => {
-          const randomArray = generateRandomArrayWithPath(2500, 2400);
+          const randomArray = generateRandomArrayWithPath(gridSize * gridSize, gridSize * gridSize - Math.floor(gridSize / 2));
           setMaze(randomArray);
           setOrigin(null);
           setDestination(null);
@@ -99,6 +105,7 @@ function Grid() {
         <PathfindingLogic
           start={origin}
           end={destination}
+          gridSize={gridSize}
           maze={maze}
           setCarPosition={setCarPosition}
           setVisitedPath={setVisitedPath}
